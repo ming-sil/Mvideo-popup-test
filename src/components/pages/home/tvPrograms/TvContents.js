@@ -165,7 +165,7 @@ const LikeBtn = styled.div`
     width: 30px;
     stroke: ${mainStyle.mainColor};
     stroke-width: 20;
-    fill: ${(props) => props.LikeBtn};
+    fill: ${(props) => props.fill};
     transition: 0.3s;
   }
   cursor: pointer;
@@ -297,21 +297,21 @@ export const TvContents = ({ tvData, contentsClass }) => {
     const detailData = async () => {
       try {
         // 상세설명
-        const { data: tvDetail } = await contentsApi.tvDetail(92782);
+        const { data: tvDetail } = await contentsApi.tvDetail(tvData.id);
         setTvDetail(tvDetail);
         // 예고편
         const {
           data: { results: tvTrailer },
-        } = await contentsApi.tvVideo(92782);
+        } = await contentsApi.tvVideo(tvData.id);
         setTvTrailer(tvTrailer.length === 0 ? null : tvTrailer[0].key);
         // 이미지
-        const { data: tvImg } = await contentsApi.tvImg(92782);
+        const { data: tvImg } = await contentsApi.tvImg(tvData.id);
         setTvImg(tvImg);
 
         // 추천작
         const {
           data: { results: tvRecommend },
-        } = await contentsApi.tvRecommend(92782);
+        } = await contentsApi.tvRecommend(tvData.id);
         setTvRecommend(tvRecommend);
         // 로딩종료
         setLoading(false);
@@ -419,7 +419,7 @@ export const TvContents = ({ tvData, contentsClass }) => {
                       </Runtime>
                       <Overview>{tvDetail.overview}</Overview>
                       <BtnWrap>
-                        <LikeBtn onClick={likeBtn}>
+                        <LikeBtn fill={likeBtn} onClick={like}>
                           <svg x="0px" y="0px" viewBox="0 0 526 512">
                             <path
                               d="M7,190.9v-5.8c0-69.9,50.5-129.5,119.4-141c44.7-7.6,92,7.3,124.6,39.9l12,12l11.1-12c33.5-32.6,79.9-47.5,125.5-39.9
@@ -445,8 +445,8 @@ c-10.3,0-20.2-3.9-27.7-10.9L54.6,300.4C24.2,272.1,7,232.4,7,190.9L7,190.9z"
                     <Thumbnails>
                       {/* <Swiper>
                         {tvImg.map((img) => (
-                          <SwiperSlide>
-                            <img src={`${imgUrl}${img.poster_path}`} />
+                          <SwiperSlide key={img.id}>
+                            <img src={`${imgUrl}${img.file_path}`} />
                           </SwiperSlide>
                         ))}
                       </Swiper> */}
