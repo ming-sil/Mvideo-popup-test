@@ -297,21 +297,21 @@ export const TvContents = ({ tvData, contentsClass }) => {
     const detailData = async () => {
       try {
         // 상세설명
-        const { data: tvDetail } = await contentsApi.tvDetail(tvData.id);
+        const { data: tvDetail } = await contentsApi.tvDetail(112836);
         setTvDetail(tvDetail);
         // 예고편
         const {
           data: { results: tvTrailer },
-        } = await contentsApi.tvVideo(tvData.id);
+        } = await contentsApi.tvVideo(112836);
         setTvTrailer(tvTrailer.length === 0 ? null : tvTrailer[0].key);
         // 이미지
-        const { data: tvImg } = await contentsApi.tvImg(tvData.id);
+        const { data: tvImg } = await contentsApi.tvImg(112836);
         setTvImg(tvImg);
 
         // 추천작
         const {
           data: { results: tvRecommend },
-        } = await contentsApi.tvRecommend(tvData.id);
+        } = await contentsApi.tvRecommend(112836);
         setTvRecommend(tvRecommend);
         // 로딩종료
         setLoading(false);
@@ -330,6 +330,7 @@ export const TvContents = ({ tvData, contentsClass }) => {
   const [bool, setBool] = useState(true);
   const [popup, setPopup] = useState("none");
   const [likeBtn, setLikeBtn] = useState("none");
+  const [position, setPosition] = useState("none");
 
   const handlePopup = () => {
     if (bool) {
@@ -361,6 +362,7 @@ export const TvContents = ({ tvData, contentsClass }) => {
     //   left: 0,
     //   behavior: "smooth",
     // });
+    console.log(PopupWrap);
   };
 
   return (
