@@ -9,6 +9,7 @@ import { Loading } from "../../../Loading";
 import { useEffect, useState } from "react";
 import { contentsApi } from "../../../../api";
 import { mainStyle } from "../../../../styles/GlobalStyle";
+import { Link } from "react-router-dom";
 
 const Wrap = styled.div`
   padding-left: 100px;
@@ -258,7 +259,7 @@ const Recommended = styled.div`
   h3 {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   p {
     font-size: 16px;
@@ -266,43 +267,49 @@ const Recommended = styled.div`
 `;
 
 const RecommendedContents = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(25%, auto));
+  row-gap: 80px;
 `;
 
-const Mov = styled.div`
-  width: 23%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  div {
-    width: 100%;
-    height: 380px;
-    background-color: salmon;
-  }
-  h5 {
-    font-size: 15px;
-    font-weight: 100;
-    margin-top: 5px;
-  }
+const RecCon = styled.div`
+  width: 95%;
+`;
+
+const RecImg = styled.div`
+  width: 100%;
+  height: 350px;
+`;
+
+const RecTitle = styled.h3`
+  font-size: 15px;
+  font-weight: 100;
+  margin-top: 5px;
 `;
 
 export const TvContents = ({ tvData, contentsClass }) => {
   const [tvDetail, setTvDetail] = useState();
   const [tvTrailer, setTvTrailer] = useState();
+  const [tvRecommend, setTvRecommend] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const detailData = async () => {
       try {
-        //tv
+        // 상세설명
         const { data: tvDetail } = await contentsApi.tvDetail(92782);
         setTvDetail(tvDetail);
+        // 예고편
         const {
           data: { results: tvTrailer },
         } = await contentsApi.tvVideo(92782);
         setTvTrailer(tvTrailer.length === 0 ? null : tvTrailer[0].key);
-
+        // 추천작
+        const {
+          data: { results: tvRecommend },
+        } = await contentsApi.tvRecommend(92782);
+        setTvRecommend(tvRecommend);
+        // 로딩종료
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -313,6 +320,7 @@ export const TvContents = ({ tvData, contentsClass }) => {
 
   console.log(tvDetail);
   console.log(tvTrailer);
+  console.log(tvRecommend);
 
   const [bool, setBool] = useState(true);
   const [popup, setPopup] = useState("none");
@@ -431,25 +439,19 @@ c-10.3,0-20.2-3.9-27.7-10.9L54.6,300.4C24.2,272.1,7,232.4,7,190.9L7,190.9z"
                 <Section3>
                   <Recommended>
                     <h3>비슷한 콘텐츠</h3>
-                    <p>더보기 ▸</p>
+                    {/* <p>더보기 ▸</p> */}
                   </Recommended>
                   <RecommendedContents>
-                    <Mov>
-                      <div />
-                      <h5>영화제목</h5>
-                    </Mov>
-                    <Mov>
-                      <div />
-                      <h5>영화제목</h5>
-                    </Mov>
-                    <Mov>
-                      <div />
-                      <h5>영화제목</h5>
-                    </Mov>
-                    <Mov>
-                      <div />
-                      <h5>영화제목</h5>
-                    </Mov>
+                    {tvRecommend.map((rec) => (
+                      <RecCon key={rec.id}>
+                        <RecImg
+                          style={{
+                            background: `url(${imgUrl}${rec.poster_path}) no-repeat center / cover`,
+                          }}
+                        />
+                        <RecTitle>{rec.name}</RecTitle>
+                      </RecCon>
+                    ))}
                   </RecommendedContents>
                 </Section3>
               </Container>
