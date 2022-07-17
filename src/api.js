@@ -26,6 +26,9 @@ export const contentsApi = {
   // 예고편
   mVideo: (id) => api.get(`/movie/${id}/videos`),
   tvVideo: (id) => api.get(`/tv/${id}/videos`),
+  // 이미지
+  mImg: (id) => api.get(`/movie/${id}/images`),
+  tvImg: (id) => api.get(`/tv/${id}/images`),
   // 추천
   mRecommend: (id) => api.get(`/movie/${id}/recommendations`),
   tvRecommend: (id) => api.get(`/tv/${id}/recommendations`),

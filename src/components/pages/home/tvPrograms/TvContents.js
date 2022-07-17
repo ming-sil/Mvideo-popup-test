@@ -63,7 +63,7 @@ const PopupWrap = styled.div`
   z-index: 998;
   overflow-y: scroll;
   position: fixed;
-  display: ${(props) => props.setPopup};
+  display: ${(props) => props.apear};
 `;
 
 const Container = styled.div`
@@ -160,15 +160,14 @@ const BtnWrap = styled.div`
 `;
 
 const LikeBtn = styled.div`
+  margin-right: 20px;
   svg {
     width: 30px;
-
     stroke: ${mainStyle.mainColor};
     stroke-width: 20;
-    fill: none;
+    fill: ${(props) => props.LikeBtn};
     transition: 0.3s;
   }
-  margin-right: 20px;
   cursor: pointer;
   &:hover {
     svg {
@@ -231,18 +230,18 @@ const Thumbnails = styled.div`
   justify-content: space-between;
 `;
 
-const Thumbnail = styled.div`
-  width: 32%;
+// const Thumbnail = styled.div`
+//   width: 32%;
 
-  background-color: rgba(0, 0, 0, 0.5);
-`;
+//   background-color: rgba(0, 0, 0, 0.5);
+// `;
 
 const Section2 = styled.div`
   margin-top: 200px;
   margin-bottom: 150px;
 `;
 
-const Trailer = styled.div`
+const Trailer = styled.iframe`
   width: 100%;
   height: 80vh;
   background-color: gray;
@@ -290,6 +289,7 @@ const RecTitle = styled.h3`
 export const TvContents = ({ tvData, contentsClass }) => {
   const [tvDetail, setTvDetail] = useState();
   const [tvTrailer, setTvTrailer] = useState();
+  const [tvImg, setTvImg] = useState();
   const [tvRecommend, setTvRecommend] = useState();
   const [loading, setLoading] = useState(true);
 
@@ -304,6 +304,10 @@ export const TvContents = ({ tvData, contentsClass }) => {
           data: { results: tvTrailer },
         } = await contentsApi.tvVideo(92782);
         setTvTrailer(tvTrailer.length === 0 ? null : tvTrailer[0].key);
+        // 이미지
+        const { data: tvImg } = await contentsApi.tvImg(92782);
+        setTvImg(tvImg);
+
         // 추천작
         const {
           data: { results: tvRecommend },
@@ -318,12 +322,14 @@ export const TvContents = ({ tvData, contentsClass }) => {
     detailData();
   }, []);
 
-  console.log(tvDetail);
-  console.log(tvTrailer);
-  console.log(tvRecommend);
+  console.log("상세정보 :" + tvDetail);
+  console.log("예고편 :" + tvTrailer);
+  console.log("이미지 :" + tvImg);
+  console.log("추천작 :" + tvRecommend);
 
   const [bool, setBool] = useState(true);
   const [popup, setPopup] = useState("none");
+  const [likeBtn, setLikeBtn] = useState("none");
 
   const handlePopup = () => {
     if (bool) {
@@ -336,15 +342,25 @@ export const TvContents = ({ tvData, contentsClass }) => {
   };
 
   const exit = () => {
-    console.log("클릭=>닫기");
+    setPopup("none");
   };
 
   const like = () => {
-    console.log("클릭=>좋아요");
+    if (bool) {
+      setLikeBtn(mainStyle.highlightColor);
+      setBool(false);
+    } else if (!bool) {
+      setLikeBtn("none");
+      setBool(true);
+    }
   };
 
   const goToTrailer = () => {
-    console.log("클릭=>스크롤");
+    // window.scrollTo({
+    //   top: 850,
+    //   left: 0,
+    //   behavior: "smooth",
+    // });
   };
 
   return (
@@ -403,7 +419,7 @@ export const TvContents = ({ tvData, contentsClass }) => {
                       </Runtime>
                       <Overview>{tvDetail.overview}</Overview>
                       <BtnWrap>
-                        <LikeBtn onClick={like}>
+                        <LikeBtn onClick={likeBtn}>
                           <svg x="0px" y="0px" viewBox="0 0 526 512">
                             <path
                               d="M7,190.9v-5.8c0-69.9,50.5-129.5,119.4-141c44.7-7.6,92,7.3,124.6,39.9l12,12l11.1-12c33.5-32.6,79.9-47.5,125.5-39.9
@@ -412,12 +428,14 @@ c-10.3,0-20.2-3.9-27.7-10.9L54.6,300.4C24.2,272.1,7,232.4,7,190.9L7,190.9z"
                             />
                           </svg>
                         </LikeBtn>
-                        <TrailerBtn onClick={goToTrailer}>
-                          <svg viewBox="0 0 384 512">
-                            <path d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z" />
-                          </svg>
-                          예고편 재생
-                        </TrailerBtn>
+                        {tvTrailer ? (
+                          <TrailerBtn onClick={goToTrailer}>
+                            <svg viewBox="0 0 384 512">
+                              <path d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z" />
+                            </svg>
+                            예고편 재생
+                          </TrailerBtn>
+                        ) : null}
                       </BtnWrap>
                     </DescWrap>
                   </TextWrap>
@@ -425,15 +443,24 @@ c-10.3,0-20.2-3.9-27.7-10.9L54.6,300.4C24.2,272.1,7,232.4,7,190.9L7,190.9z"
                   <ImgWrap>
                     <MainImg></MainImg>
                     <Thumbnails>
-                      <Thumbnail />
-                      <Thumbnail />
-                      <Thumbnail />
+                      {/* <Swiper>
+                        {tvImg.map((img) => (
+                          <SwiperSlide>
+                            <img src={`${imgUrl}${img.poster_path}`} />
+                          </SwiperSlide>
+                        ))}
+                      </Swiper> */}
                     </Thumbnails>
                   </ImgWrap>
                 </Section1>
 
                 <Section2>
-                  <Trailer></Trailer>
+                  {tvTrailer ? (
+                    <Trailer
+                      src={`https://www.youtube.com/embed/${tvTrailer}`}
+                      allowfullscreen
+                    ></Trailer>
+                  ) : null}{" "}
                 </Section2>
 
                 <Section3>
